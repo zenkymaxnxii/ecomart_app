@@ -10,7 +10,6 @@ import 'components/edit_image.dart';
 import 'components/edit_name.dart';
 import 'components/edit_phone.dart';
 
-// This class handles the Page to dispaly the user's info on the "Edit Profile" Screen
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -23,57 +22,55 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final user = UserData.myUser;
 
-    return Scaffold(
-      body: Column(
-        children: [
-          AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            toolbarHeight: 10,
-          ),
-          Stack(
-            children: [
-              const Center(
-                  child: Padding(
-                      padding: EdgeInsets.only(bottom: 20),
-                      child: Text(
-                        'Sửa thông tin',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700,
-                          color: kPrimaryColor,
-                        ),
-                      ))),
-              Align(
-                alignment: Alignment.topRight,
-                child: InkWell(
-                  onTap: (){
-                    AuthHelper.logOut();
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.only(right: 20),
-                    child: Icon(Icons.logout, size: 30,color: kPrimaryColor,),
-                  ),
+    return Column(
+      children: [
+        AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          toolbarHeight: 10,
+        ),
+        Stack(
+          children: [
+            const Center(
+                child: Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: Text(
+                      'Sửa thông tin',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w700,
+                        color: kPrimaryColor,
+                      ),
+                    ))),
+            Align(
+              alignment: Alignment.topRight,
+              child: InkWell(
+                onTap: (){
+                  AuthHelper.logOut();
+                },
+                child: const Padding(
+                  padding: EdgeInsets.only(right: 20),
+                  child: Icon(Icons.logout, size: 30,color: kPrimaryColor,),
                 ),
-              )
-            ],
-          ),
-          InkWell(
-              onTap: () {
-                navigateSecondPage(const EditImagePage());
-              },
-              child: DisplayImage(
-                imagePath: user.image,
-                onPressed: () {},
-              )),
-          buildUserInfoDisplay(user.name, 'Họ tên', const EditNameFormPage()),
-          buildUserInfoDisplay(
-              user.phone, 'Số điện thoại', const EditPhoneFormPage()),
-          buildUserInfoDisplay(user.email, 'Email', const EditEmailFormPage()),
-          buildUserInfoDisplay(
-              user.aboutMeDescription, 'Địa chỉ', EditDescriptionFormPage()),
-        ],
-      ),
+              ),
+            )
+          ],
+        ),
+        InkWell(
+            onTap: () {
+              navigateSecondPage(const EditImagePage());
+            },
+            child: DisplayImage(
+              imagePath: user.image,
+              onPressed: () {},
+            )),
+        buildUserInfoDisplay(user.name, 'Họ tên', const EditNameFormPage()),
+        buildUserInfoDisplay(
+            user.phone, 'Số điện thoại', const EditPhoneFormPage()),
+        buildUserInfoDisplay(user.email, 'Email', const EditEmailFormPage()),
+        buildUserInfoDisplay(
+            user.aboutMeDescription, 'Địa chỉ', EditDescriptionFormPage()),
+      ],
     );
   }
 

@@ -1,11 +1,11 @@
 import 'package:ecomart_app/Model/ItemGridView.dart';
-import 'package:ecomart_app/Screens/Book/book_screen.dart';
 import 'package:ecomart_app/Screens/Donations/donations_screen.dart';
 import 'package:ecomart_app/Screens/GiftExchange/gift_exchange_screen.dart';
 import 'package:ecomart_app/Screens/Order/order_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import '../Book/book.dart';
 
 class HomePage2 extends StatefulWidget {
   const HomePage2({Key? key}) : super(key: key);
@@ -185,7 +185,7 @@ class _HomePage2State extends State<HomePage2> {
   }
   List<ItemGridView> getList() {
     List<ItemGridView> list = List.empty(growable: true);
-    list.add(ItemGridView("Thu rác tại nhà", "Đặt lịch", Icons.recycling,const BookScreen()));
+    list.add(ItemGridView("Thu rác tại nhà", "Đặt lịch", Icons.recycling,const Book()));
     list.add(ItemGridView("Đổi điểm lấy quà", "Đổi ngay", Icons.card_giftcard, const GiftExchangeScreen()));
     list.add(ItemGridView("Đơn đang xử lý", "Xem ngay", Icons.card_membership, const OrderScreen()));
     list.add(ItemGridView("Quyên góp điểm", "Đồng ý", Icons.account_balance_wallet, const DonationsScreen()));
