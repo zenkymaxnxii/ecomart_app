@@ -90,7 +90,6 @@ class _LoginFormState extends State<LoginForm> {
                             isLoading = false;
                           });
                           _openMyPage();
-                          print("login successful");
                         }
                       } catch (e) {
                         print(e);

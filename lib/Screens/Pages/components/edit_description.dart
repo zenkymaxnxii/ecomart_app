@@ -5,8 +5,10 @@ import 'package:ecomart_app/components/appbar_widget.dart';
 
 // This class handles the Page to edit the About Me Section of the User Profile.
 class EditDescriptionFormPage extends StatefulWidget {
+  const EditDescriptionFormPage({Key? key}) : super(key: key);
+
   @override
-  _EditDescriptionFormPageState createState() =>
+  State<EditDescriptionFormPage> createState() =>
       _EditDescriptionFormPageState();
 }
 
