@@ -82,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     buildUserInfoDisplay(
                         userData['email'], 'Email', const EditEmailFormPage(), isEdit: false),
                     buildUserInfoDisplay(userData['address'], 'Địa chỉ',
-                        EditDescriptionFormPage()),
+                        const EditDescriptionFormPage()),
                   ],
                 );
               } else {

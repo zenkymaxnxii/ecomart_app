@@ -64,7 +64,7 @@ class EditEmailFormPageState extends State<EditEmailFormPage> {
                           controller: emailController,
                         ))),
                 Padding(
-                    padding: EdgeInsets.only(top: 150),
+                    padding: const EdgeInsets.only(top: 150),
                     child: Align(
                         alignment: Alignment.bottomCenter,
                         child: SizedBox(
