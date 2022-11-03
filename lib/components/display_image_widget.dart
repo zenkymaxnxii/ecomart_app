@@ -22,11 +22,11 @@ class DisplayImage extends StatelessWidget {
     return Center(
         child: Stack(children: [
       buildImage(color),
-      Positioned(
-        right: 4,
-        top: 10,
-        child: buildEditIcon(color),
-      )
+      // Positioned(
+      //   right: 4,
+      //   top: 10,
+      //   child: buildEditIcon(color),
+      // )
     ]));
   }
 
@@ -47,13 +47,13 @@ class DisplayImage extends StatelessWidget {
   }
 
   // Builds Edit Icon on Profile Picture
-  Widget buildEditIcon(Color color) => buildCircle(
-      all: 8,
-      child: Icon(
-        Icons.edit,
-        color: color,
-        size: 20,
-      ));
+  // Widget buildEditIcon(Color color) => buildCircle(
+  //     all: 8,
+  //     child: Icon(
+  //       Icons.edit,
+  //       color: color,
+  //       size: 20,
+  //     ));
 
   // Builds/Makes Circle for Edit Icon on Profile Picture
   Widget buildCircle({

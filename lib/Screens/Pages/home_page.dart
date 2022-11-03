@@ -1,25 +1,30 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomart_app/Model/ItemGridView.dart';
-import 'package:ecomart_app/Screens/Donations/donations_screen.dart';
 import 'package:ecomart_app/Screens/GiftExchange/gift_exchange_screen.dart';
+import 'package:ecomart_app/Screens/GiftExchange/gift_exchanged_screen.dart';
 import 'package:ecomart_app/Screens/Order/order_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
-import '../Book/book.dart';
+import '../../utils/auth_helper.dart';
+import '../Book/book_screen.dart';
 
 class HomePage2 extends StatefulWidget {
   const HomePage2({Key? key}) : super(key: key);
+
   @override
   State<HomePage2> createState() => _HomePage2State();
 }
 
 class _HomePage2State extends State<HomePage2> {
   List<ItemGridView> listItem = List.empty(growable: true);
+
   @override
   void initState() {
     super.initState();
     listItem.addAll(getList());
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -30,7 +35,7 @@ class _HomePage2State extends State<HomePage2> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Stack(children:  [
+              Stack(children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 5, right: 8),
                   child: Icon(Icons.email_outlined),
@@ -42,14 +47,15 @@ class _HomePage2State extends State<HomePage2> {
                     padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
                         color: Colors.red,
-                        borderRadius: BorderRadius.circular(20)
-                    ),
+                        borderRadius: BorderRadius.circular(20)),
                     child: const Center(
-                      child: Text("10", style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold
-                      ),),
+                      child: Text(
+                        "10",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 )
@@ -72,15 +78,29 @@ class _HomePage2State extends State<HomePage2> {
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
+                children: [
+                  const Text(
                     "Hello,",
                     style: TextStyle(fontSize: 18, color: Colors.black26),
                   ),
-                  Text(
-                    "Nhật Minh",
-                    style: TextStyle(fontSize: 23, color: Colors.black54),
-                  ),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(AuthHelper.getId())
+                          .snapshots(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<DocumentSnapshot> snapShot) {
+                        if (snapShot.hasData) {
+                          final user = snapShot.data!;
+                          return Text(
+                            user["name"] ?? "",
+                            style: const TextStyle(
+                                fontSize: 23, color: Colors.black54),
+                          );
+                        } else {
+                          return const SizedBox();
+                        }
+                      })
                 ],
               )
             ],
@@ -98,7 +118,7 @@ class _HomePage2State extends State<HomePage2> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: List.generate(listItem.length, (index) {
                   return GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -183,14 +203,17 @@ class _HomePage2State extends State<HomePage2> {
       ),
     );
   }
+
   List<ItemGridView> getList() {
     List<ItemGridView> list = List.empty(growable: true);
-    list.add(ItemGridView("Thu rác tại nhà", "Đặt lịch", Icons.recycling,const Book()));
-    list.add(ItemGridView("Đổi điểm lấy quà", "Đổi ngay", Icons.card_giftcard, const GiftExchangeScreen()));
-    list.add(ItemGridView("Đơn đang xử lý", "Xem ngay", Icons.card_membership, const OrderScreen()));
-    list.add(ItemGridView("Quyên góp điểm", "Đồng ý", Icons.account_balance_wallet, const DonationsScreen()));
+    list.add(ItemGridView(
+        "Thu rác tại nhà", "Đặt lịch", Icons.recycling, const BookScreen()));
+    list.add(ItemGridView("Đổi điểm lấy quà", "Đổi ngay", Icons.card_giftcard,
+        const GiftExchangeScreen()));
+    list.add(ItemGridView("Đơn đang xử lý", "Xem ngay", Icons.card_membership,
+        const OrderScreen()));
+    list.add(ItemGridView("Quà đã đổi", "Xem lại",
+        Icons.account_balance_wallet, const GiftExchangedScreen()));
     return list;
   }
 }
-
-

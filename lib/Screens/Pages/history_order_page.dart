@@ -1,5 +1,6 @@
-import 'package:ecomart_app/Model/order.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomart_app/constants.dart';
+import 'package:ecomart_app/utils/auth_helper.dart';
 import 'package:flutter/material.dart';
 
 class HistoryOrderPage extends StatefulWidget {
@@ -16,7 +17,7 @@ class _HistoryOrderPageState extends State<HistoryOrderPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -60,6 +61,9 @@ class _HistoryOrderPageState extends State<HistoryOrderPage>
             Tab(
               text: 'Đang xử lý',
             ),
+            Tab(
+              text: 'Đã hoàn thành',
+            ),
           ],
           controller: _tabController,
           indicatorSize: TabBarIndicatorSize.tab,
@@ -71,8 +75,9 @@ class _HistoryOrderPageState extends State<HistoryOrderPage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                allOrder(allOrder: true),
-                allOrder(allOrder: false),
+                listViewOrder(typeGet: 3),
+                listViewOrder(typeGet: 2),
+                listViewOrder(typeGet: 1),
               ],
             ),
           ),
@@ -81,173 +86,145 @@ class _HistoryOrderPageState extends State<HistoryOrderPage>
     );
   }
 
-  Widget allOrder({required bool allOrder}) {
-    final List<Order> entries = List.empty(growable: true);
-
-    entries.addAll(getList(allOrder: allOrder));
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: entries.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Container(
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.grey,
-                width: 0.5,
-              ),
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(3),
-                margin: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: kPrimaryLightColor),
-                child: const Icon(Icons.recycling),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          entries[index].name!,
-                          style: const TextStyle(
-                              color: kPrimaryColor, fontSize: 22),
-                        ),
-                        const Text(" - "),
-                        Text("${entries[index].amount} Kg")
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 3,
-                    ),
-                    Row(
-                      children: [
-                        Text(entries[index].dateTime!),
-                        const Text(" - "),
-                        Text(
-                          entries[index].status! ? "Hoàn tất" : "Đang xử lý",
-                          style: TextStyle(
-                            color: entries[index].status!
-                                ? Colors.yellow
-                                : Colors.red,
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 3,
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.5,
-                      child: Text(
-                        entries[index].address!,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
+  Widget listViewOrder({required int typeGet}) {
+    return StreamBuilder(
+        stream: getStream(typeGet),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasData) {
+            final listOrders = snapshot.data!.docs;
+            return ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: listOrders.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 0.5,
                       ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-        );
-      },
-    );
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        margin: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: kPrimaryLightColor),
+                        child: const Icon(Icons.recycling),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  listOrders[index]['name'],
+                                  style: const TextStyle(
+                                      color: kPrimaryColor, fontSize: 22),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text("(${listOrders[index]['amount']})")
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 3,
+                            ),
+                            Row(
+                              children: [
+                                Text(listOrders[index]['date_time']
+                                    .toString()
+                                    .substring(0, 16)),
+                                const Text(" - "),
+                                Text(
+                                  listOrders[index]['status'] == 0
+                                      ? "Đang xử lý"
+                                      : listOrders[index]['status'] == 1
+                                          ? "Đang đến lấy"
+                                          : "Đã hoàn thành",
+                                  style: TextStyle(
+                                    color: listOrders[index]['status'] == 0
+                                        ? Colors.yellow
+                                        : listOrders[index]['status'] == 1
+                                            ? Colors.red
+                                            : Colors.green,
+                                  ),
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 3,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 1.5,
+                              child: Text(
+                                listOrders[index]['address'],
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 3,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 1.5,
+                              child: Text(
+                                listOrders[index]['description'],
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 3,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 1.5,
+                              child: Text(
+                                listOrders[index]['note'],
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              },
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
   }
-
-  Iterable<Order> getList({required bool allOrder}) {
-    final List<Order> entries = List.empty(growable: true);
-
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: true));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: false));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: true));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: false));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: true));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: false));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: true));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: false));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: true));
-    entries.add(Order(
-        name: "Nhật Minh",
-        address: "Số 9 ngõ 54, đường Trần Quốc Tuấn, tp Đà Lạt",
-        des: "Nhựa: 5kg, Giấy: 10kg, Rau: 10kg, Khác: 5kg",
-        note: "Ghi chú",
-        dateTime: "10:30 11/02/2022",
-        amount: 30,
-        status: true));
-    Iterable<Order> result = entries.where((element) => !element.status!);
-    return allOrder ? entries : result;
+  getStream(int typeGet) {
+    switch(typeGet){
+      case 2:
+        return FirebaseFirestore.instance
+            .collection("orders")
+            .where("uid", isEqualTo: AuthHelper.getId().toString())
+            .where("status", whereIn: [0 , 1])
+            .snapshots();
+      case 1:
+        return FirebaseFirestore.instance
+            .collection("orders")
+            .where("uid", isEqualTo: AuthHelper.getId().toString())
+            .where("status", isEqualTo: 2)
+            .snapshots();
+    }
+    return FirebaseFirestore.instance
+        .collection("orders")
+        .where("uid", isEqualTo: AuthHelper.getId().toString())
+        .snapshots();
   }
 
   @override

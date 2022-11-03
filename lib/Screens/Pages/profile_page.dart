@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomart_app/constants.dart';
 import 'package:flutter/material.dart';
 import '../../Model/user_data.dart';
@@ -6,7 +7,6 @@ import '../../components/display_image_widget.dart';
 import '../../utils/auth_helper.dart';
 import 'components/edit_description.dart';
 import 'components/edit_email.dart';
-import 'components/edit_image.dart';
 import 'components/edit_name.dart';
 import 'components/edit_phone.dart';
 
@@ -45,37 +45,60 @@ class _ProfilePageState extends State<ProfilePage> {
             Align(
               alignment: Alignment.topRight,
               child: InkWell(
-                onTap: (){
+                onTap: () {
                   AuthHelper.logOut();
                 },
                 child: const Padding(
                   padding: EdgeInsets.only(right: 20),
-                  child: Icon(Icons.logout, size: 30,color: kPrimaryColor,),
+                  child: Icon(
+                    Icons.logout,
+                    size: 30,
+                    color: kPrimaryColor,
+                  ),
                 ),
               ),
             )
           ],
         ),
-        InkWell(
-            onTap: () {
-              navigateSecondPage(const EditImagePage());
-            },
-            child: DisplayImage(
-              imagePath: user.image,
-              onPressed: () {},
-            )),
-        buildUserInfoDisplay(user.name, 'Họ tên', const EditNameFormPage()),
-        buildUserInfoDisplay(
-            user.phone, 'Số điện thoại', const EditPhoneFormPage()),
-        buildUserInfoDisplay(user.email, 'Email', const EditEmailFormPage()),
-        buildUserInfoDisplay(
-            user.aboutMeDescription, 'Địa chỉ', EditDescriptionFormPage()),
+        DisplayImage(
+          imagePath: user.image,
+          onPressed: () {},
+        ),
+        StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection("users")
+                .doc(AuthHelper.getId())
+                .snapshots(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapShot) {
+              if (snapShot.hasData){
+                final userData = snapShot.data!;
+                return Column(
+                  children: [
+                    buildUserInfoDisplay(
+                        userData['name'], 'Họ tên', const EditNameFormPage()),
+                    buildUserInfoDisplay(
+                        userData['phone_number'], 'Số điện thoại', const EditPhoneFormPage()),
+                    buildUserInfoDisplay(
+                        userData['email'], 'Email', const EditEmailFormPage(), isEdit: false),
+                    buildUserInfoDisplay(userData['address'], 'Địa chỉ',
+                        EditDescriptionFormPage()),
+                  ],
+                );
+              } else {
+                return const Material(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+            }),
       ],
     );
   }
 
   // Widget builds the display item with the proper formatting to display the user's info
-  Widget buildUserInfoDisplay(String getValue, String title, Widget editPage) =>
+  Widget buildUserInfoDisplay(String getValue, String title, Widget editPage, {bool isEdit = true}) =>
       Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Column(
@@ -101,12 +124,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.grey,
                     width: 1,
                   ))),
-                  child: Row(
-                      children: [
+                  child: Row(children: [
                     Expanded(
                         child: TextButton(
                             onPressed: () {
-                              navigateSecondPage(editPage);
+                              if(isEdit) navigateSecondPage(editPage);
                             },
                             child: Text(
                               getValue,
@@ -115,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   height: 1.4,
                                   color: kPrimaryColor),
                             ))),
-                    const Icon(
+                    if(isEdit) const Icon(
                       Icons.keyboard_arrow_right,
                       color: Colors.grey,
                       size: 40.0,

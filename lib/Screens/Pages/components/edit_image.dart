@@ -11,7 +11,7 @@ class EditImagePage extends StatefulWidget {
   const EditImagePage({Key? key}) : super(key: key);
 
   @override
-  _EditImagePageState createState() => _EditImagePageState();
+  State<EditImagePage> createState() => _EditImagePageState();
 }
 
 class _EditImagePageState extends State<EditImagePage> {
@@ -25,9 +25,9 @@ class _EditImagePageState extends State<EditImagePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          SizedBox(
+          const SizedBox(
               width: 330,
-              child: const Text(
+              child: Text(
                 "Upload a photo of yourself:",
                 style: TextStyle(
                   fontSize: 23,
@@ -35,7 +35,7 @@ class _EditImagePageState extends State<EditImagePage> {
                 ),
               )),
           Padding(
-              padding: EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20),
               child: SizedBox(
                   width: 330,
                   child: GestureDetector(
@@ -56,7 +56,7 @@ class _EditImagePageState extends State<EditImagePage> {
                     child: Image.network(user.image),
                   ))),
           Padding(
-              padding: EdgeInsets.only(top: 40),
+              padding: const EdgeInsets.only(top: 40),
               child: Align(
                   alignment: Alignment.bottomCenter,
                   child: SizedBox(
@@ -65,7 +65,7 @@ class _EditImagePageState extends State<EditImagePage> {
                     child: ElevatedButton(
                       onPressed: () {},
                       child: const Text(
-                        'Update',
+                        'Cập nhật',
                         style: TextStyle(fontSize: 15),
                       ),
                     ),

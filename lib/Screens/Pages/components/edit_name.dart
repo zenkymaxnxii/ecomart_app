@@ -1,6 +1,5 @@
+import 'package:ecomart_app/utils/auth_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:string_validator/string_validator.dart';
-import 'package:ecomart_app/Model/user_data.dart';
 import 'package:ecomart_app/components/appbar_widget.dart';
 
 // This class handles the Page to edit the Name Section of the User Profile.
@@ -15,18 +14,16 @@ class EditNameFormPage extends StatefulWidget {
 
 class EditNameFormPageState extends State<EditNameFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final firstNameController = TextEditingController();
-  final secondNameController = TextEditingController();
-  var user = UserData.myUser;
+  final fullNameController = TextEditingController();
 
   @override
   void dispose() {
-    firstNameController.dispose();
+    fullNameController.dispose();
     super.dispose();
   }
 
   void updateUserValue(String name) {
-    user.name = name;
+    UserHelper.updateUser("name", name);
   }
 
   @override
@@ -39,61 +36,31 @@ class EditNameFormPageState extends State<EditNameFormPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              SizedBox(
+              const SizedBox(
                   width: 330,
-                  child: const Text(
-                    "What's Your Name?",
+                  child: Text(
+                    "Họ và tên của bạn là gì?",
                     style: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.bold,
                     ),
                   )),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(0, 40, 16, 0),
-                      child: SizedBox(
-                          height: 100,
-                          width: 150,
-                          child: TextFormField(
-                            // Handles Form Validation for First Name
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your first name';
-                              } else if (!isAlpha(value)) {
-                                return 'Only Letters Please';
-                              }
-                              return null;
-                            },
-                            decoration:
-                                InputDecoration(labelText: 'First Name'),
-                            controller: firstNameController,
-                          ))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(0, 40, 16, 0),
-                      child: SizedBox(
-                          height: 100,
-                          width: 150,
-                          child: TextFormField(
-                            // Handles Form Validation for Last Name
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your last name';
-                              } else if (!isAlpha(value)) {
-                                return 'Only Letters Please';
-                              }
-                              return null;
-                            },
-                            decoration:
-                                const InputDecoration(labelText: 'Last Name'),
-                            controller: secondNameController,
-                          )))
-                ],
-              ),
               Padding(
-                  padding: EdgeInsets.only(top: 150),
+                  padding: const EdgeInsets.fromLTRB(20, 40, 20, 0),
+                  child: TextFormField(
+                    // Handles Form Validation for First Name
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Xin vui lòng nhập họ và tên!';
+                      }
+                      return null;
+                    },
+                    decoration:
+                        const InputDecoration(labelText: 'Họ và tên'),
+                    controller: fullNameController,
+                  )),
+              Padding(
+                  padding: const EdgeInsets.only(top: 150),
                   child: Align(
                       alignment: Alignment.bottomCenter,
                       child: SizedBox(
@@ -102,17 +69,13 @@ class EditNameFormPageState extends State<EditNameFormPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             // Validate returns true if the form is valid, or false otherwise.
-                            if (_formKey.currentState!.validate() &&
-                                isAlpha(firstNameController.text +
-                                    secondNameController.text)) {
-                              updateUserValue(firstNameController.text +
-                                  " " +
-                                  secondNameController.text);
+                            if (_formKey.currentState!.validate()) {
+                              updateUserValue(fullNameController.text);
                               Navigator.pop(context);
                             }
                           },
                           child: const Text(
-                            'Update',
+                            'Cập nhật',
                             style: TextStyle(fontSize: 15),
                           ),
                         ),

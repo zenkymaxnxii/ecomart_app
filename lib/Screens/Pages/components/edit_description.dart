@@ -1,3 +1,4 @@
+import 'package:ecomart_app/utils/auth_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:ecomart_app/Model/user_data.dart';
 import 'package:ecomart_app/components/appbar_widget.dart';
@@ -11,17 +12,17 @@ class EditDescriptionFormPage extends StatefulWidget {
 
 class _EditDescriptionFormPageState extends State<EditDescriptionFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final descriptionController = TextEditingController();
+  final addressController = TextEditingController();
   var user = UserData.myUser;
 
   @override
   void dispose() {
-    descriptionController.dispose();
+    addressController.dispose();
     super.dispose();
   }
 
-  void updateUserValue(String description) {
-    user.aboutMeDescription = description;
+  void updateUserValue(String address) {
+    UserHelper.updateUser("address", address);
   }
 
   @override
@@ -34,40 +35,35 @@ class _EditDescriptionFormPageState extends State<EditDescriptionFormPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                SizedBox(
+                const SizedBox(
                     width: 350,
-                    child: const Text(
-                      "What type of passenger\nare you?",
+                    child: Text(
+                      "Địa chỉ của bạn ở đâu vậy?",
                       style:
                           TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     )),
                 Padding(
-                    padding: EdgeInsets.all(20),
-                    child: SizedBox(
-                        height: 250,
-                        width: 350,
-                        child: TextFormField(
-                          // Handles Form Validation
-                          validator: (value) {
-                            if (value == null ||
-                                value.isEmpty ||
-                                value.length > 200) {
-                              return 'Please describe yourself but keep it under 200 characters.';
-                            }
-                            return null;
-                          },
-                          controller: descriptionController,
-                          textAlignVertical: TextAlignVertical.top,
-                          decoration: const InputDecoration(
-                              alignLabelWithHint: true,
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(10, 15, 10, 100),
-                              hintMaxLines: 3,
-                              hintText:
-                                  'Write a little bit about yourself. Do you like chatting? Are you a smoker? Do you bring pets with you? Etc.'),
-                        ))),
+                    padding: const EdgeInsets.all(20),
+                    child: TextFormField(
+                      // Handles Form Validation
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty) {
+                          return 'Xin vui lòng nhập địa chỉ!';
+                        }
+                        return null;
+                      },
+                      controller: addressController,
+                      textAlignVertical: TextAlignVertical.top,
+                      decoration: const InputDecoration(
+                          alignLabelWithHint: true,
+                          contentPadding:
+                              EdgeInsets.fromLTRB(10, 15, 10, 70),
+                          hintMaxLines: 3,
+                          hintText:"Địa chỉ của bạn, ví dụ:\nSố 333/43/12, Đường Phan Đình Phùng, Quận Bắc Nam, Thành Phố Lào Cai"),
+                    )),
                 Padding(
-                    padding: EdgeInsets.only(top: 50),
+                    padding: const EdgeInsets.only(top: 50),
                     child: Align(
                         alignment: Alignment.bottomCenter,
                         child: SizedBox(
@@ -77,12 +73,12 @@ class _EditDescriptionFormPageState extends State<EditDescriptionFormPage> {
                             onPressed: () {
                               // Validate returns true if the form is valid, or false otherwise.
                               if (_formKey.currentState!.validate()) {
-                                updateUserValue(descriptionController.text);
+                                updateUserValue(addressController.text);
                                 Navigator.pop(context);
                               }
                             },
                             child: const Text(
-                              'Update',
+                              'Cập nhật',
                               style: TextStyle(fontSize: 15),
                             ),
                           ),
