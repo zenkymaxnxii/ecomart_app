@@ -12,6 +12,9 @@ class SignUpScreenTopImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(
+          height: 50,
+        ),
         Text(
           signUp.toUpperCase(),
           style: const TextStyle(fontWeight: FontWeight.bold),

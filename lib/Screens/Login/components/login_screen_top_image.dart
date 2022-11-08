@@ -12,6 +12,9 @@ class LoginScreenTopImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(
+          height: 50,
+        ),
         Text(
           signIn.toUpperCase(),
           style: const TextStyle(fontWeight: FontWeight.bold),

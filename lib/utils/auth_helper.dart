@@ -73,12 +73,42 @@ class UserHelper {
       "uid": AuthHelper.getId(),
     };
     await _db.collection("orders").add(order);
+    await notificationToAdmin(
+        address: address,
+        description: description,
+        name: name,
+        phoneNumber: phoneNumber);
+  }
+
+  static handleBooked({required String orderId, required int status}) async {
+    final orderRef = _db.collection("orders").doc(orderId);
+    if ((await orderRef.get()).exists) {
+      await orderRef.update({
+        "status": status,
+      });
+    }
+
+    await notificationToUser(
+        status: status,
+        address: (await orderRef.get())['address'],
+        description: (await orderRef.get())['description']);
+  }
+
+  static readNotice(
+      {required String noticeId, required String collection}) async {
+    final orderRef = _db.collection(collection).doc(noticeId);
+    if ((await orderRef.get()).exists) {
+      await orderRef.update({
+        "readed": true,
+      });
+    }
   }
 
   static orderGift(
       {required String uidGift,
-        required String nameGift,
-        required int price, required String url}) async {
+      required String nameGift,
+      required int price,
+      required String url}) async {
     String datetime = DateTime.now().toString();
     Map<String, dynamic> orderGift = {
       "uid_gift": uidGift,
@@ -95,16 +125,51 @@ class UserHelper {
 
   static updatePoint({required int point, required bool calculation}) async {
     final pointRef = _db.collection("reward_points").doc(AuthHelper.getId());
-    Map<String, int> pointMap = {
-      "point": point
-    };
+    Map<String, int> pointMap = {"point": point};
     if ((await pointRef.get()).exists) {
       await pointRef.update({
-        "point": FieldValue.increment(calculation?point:point*(-1)),
+        "point": FieldValue.increment(calculation ? point : point * (-1)),
       });
     } else {
-      await _db.collection("reward_points").doc(AuthHelper.getId()).set(pointMap);
+      await _db
+          .collection("reward_points")
+          .doc(AuthHelper.getId())
+          .set(pointMap);
     }
+  }
+
+  static notificationToUser(
+      {required int status,
+      required String address,
+      required String description}) async {
+    String datetime = DateTime.now().toString();
+    Map<String, dynamic> notice = {
+      "status": status,
+      "address": address,
+      "description": description,
+      "date_time": datetime,
+      "readed": false,
+      "uid_user": AuthHelper.getId(),
+    };
+    await _db.collection("notice_user").add(notice);
+  }
+
+  static notificationToAdmin(
+      {required String name,
+      required String phoneNumber,
+      required String address,
+      required String description}) async {
+    String datetime = DateTime.now().toString();
+    Map<String, dynamic> notice = {
+      "name": name,
+      "phone_number": phoneNumber,
+      "address": address,
+      "description": description,
+      "date_time": datetime,
+      "readed": false,
+      "uid_user": AuthHelper.getId(),
+    };
+    await _db.collection("notice_admin").add(notice);
   }
 
   static updateUser(String key, String value) async {
@@ -112,5 +177,17 @@ class UserHelper {
         .collection("users")
         .doc(AuthHelper.getId())
         .update({key: value});
+  }
+
+  static getRole() async {
+    final docRef = _db.collection("users").doc(AuthHelper.getId());
+    docRef.get().then(
+      (DocumentSnapshot doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        return data['role']=="admin"?true:false;
+      },
+      onError: (e) => print("Error getting document: $e"),
+    );
+    return false;
   }
 }

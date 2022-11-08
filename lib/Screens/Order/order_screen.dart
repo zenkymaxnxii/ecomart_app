@@ -40,10 +40,7 @@ class OrderScreenState extends State<OrderScreen> {
 
   Widget listViewOrder() {
     return StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("orders")
-            .where("uid", isEqualTo: AuthHelper.getId().toString())
-            .where("status", whereIn: [0, 1]).snapshots(),
+        stream: getStream(true),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasData) {
             final listOrders = snapshot.data!.docs;
@@ -101,14 +98,14 @@ class OrderScreenState extends State<OrderScreen> {
                                   listOrders[index]['status'] == 0
                                       ? "Đang xử lý"
                                       : listOrders[index]['status'] == 1
-                                      ? "Đang đến lấy"
-                                      : "Đã hoàn thành",
+                                          ? "Đang đến lấy"
+                                          : "Đã hoàn thành",
                                   style: TextStyle(
                                     color: listOrders[index]['status'] == 0
                                         ? Colors.yellow
                                         : listOrders[index]['status'] == 1
-                                        ? Colors.red
-                                        : Colors.green,
+                                            ? Colors.red
+                                            : Colors.green,
                                   ),
                                 )
                               ],
@@ -160,5 +157,16 @@ class OrderScreenState extends State<OrderScreen> {
             );
           }
         });
+  }
+
+  getStream(bool isAdmin) {
+    return isAdmin
+        ? FirebaseFirestore.instance
+            .collection("orders")
+            .where("status", whereIn: [0, 1]).snapshots()
+        : FirebaseFirestore.instance
+            .collection("orders")
+            .where("uid", isEqualTo: AuthHelper.getId().toString())
+            .where("status", whereIn: [0, 1]).snapshots();
   }
 }
