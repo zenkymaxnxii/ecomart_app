@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:ecomart_app/constants.dart';
 import '../Pages/profile_page.dart';
@@ -5,7 +7,8 @@ import '../Pages/history_order_page.dart';
 import '../Pages/home_page.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key, this.isHistory = false}) : super(key: key);
+  bool isHistory;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -18,11 +21,15 @@ class _HomeScreenState extends State<HomeScreen> {
     ProfilePage(),
     HistoryOrderPage(),
   ];
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) => WillPopScope(
         child: Scaffold(
-          body: pages[_currentIndex],
+          body: widget.isHistory ? pages[2] : pages[_currentIndex],
           bottomNavigationBar: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -39,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               onTap: (index) {
                 setState(() {
+                  widget.isHistory = false;
                   _currentIndex = index;
                 });
               },

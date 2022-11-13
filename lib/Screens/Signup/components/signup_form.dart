@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants.dart';
+import '../../../main.dart';
 import '../../../utils/auth_helper.dart';
 import '../../Login/login_screen.dart';
 
@@ -27,6 +31,47 @@ class _SignUpFormState extends State<SignUpForm> {
     _emailController = TextEditingController(text: "");
     _passwordController = TextEditingController(text: "");
     _confirmPasswordController = TextEditingController(text: "");
+  }
+  String mToken = "";
+
+  Future<void> requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      sound: true,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print("User granted permission");
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      print("User granted provisional permission");
+    } else {
+      print("User declined or has not accepted permission");
+    }
+  }
+
+  Future<void> getToken() async {
+    await FirebaseMessaging.instance.getToken().then((token) {
+      setState(() {
+        mToken = token!;
+        print("My token is: $mToken");
+      });
+      saveToken(mToken);
+    });
+  }
+
+  void saveToken(String token) async {
+    final userRef =
+    FirebaseFirestore.instance.collection("users").doc(AuthHelper.getId());
+    if ((await userRef.get()).exists) {
+      await userRef.update({
+        "token": token,
+      });
+    }
   }
 
   @override
@@ -119,9 +164,11 @@ class _SignUpFormState extends State<SignUpForm> {
                         setState(() {
                           isLoading = false;
                         });
-                        UserHelper.saveUser(user);
+                        await UserHelper.saveUser(user);
+                        await requestPermission();
+                        await getToken();
                         print("signup successful");
-                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const MyApp()));
                       }
                     } catch (e) {
                       print(e);

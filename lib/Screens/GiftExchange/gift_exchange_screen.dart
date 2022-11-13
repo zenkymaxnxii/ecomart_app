@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomart_app/utils/auth_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../components/appbar_widget.dart';
 import '../../constants.dart';
 import 'gift_detail.dart';
+import 'package:path/path.dart';
 
 class GiftExchangeScreen extends StatefulWidget {
   const GiftExchangeScreen({Key? key}) : super(key: key);
@@ -19,6 +21,180 @@ class _GiftExchangeScreenState extends State<GiftExchangeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(context),
+      floatingActionButton: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection("users")
+            .doc(AuthHelper.getId())
+            .snapshots(),
+        builder: (BuildContext context,
+            AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            final user = snapshot.data!;
+            if (user['role'] == 'admin') {
+              return FloatingActionButton(
+                backgroundColor: Colors.green,
+                onPressed: () => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      TextEditingController name = TextEditingController(text: "");
+                      TextEditingController price = TextEditingController(text: "");
+                      TextEditingController description = TextEditingController(text: "");
+                      TextEditingController amount = TextEditingController(text: "");
+                      TextEditingController photo = TextEditingController(text: "");
+                      XFile? image;
+                      String imageName = "";
+                      return AlertDialog(
+                        title: const Text('Thêm quà tặng'),
+                        content: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: SizedBox(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextFormField(
+                                    controller: name,
+                                    cursorColor: kPrimaryColor,
+                                    decoration:
+                                    const InputDecoration(
+                                      hintText: "Tên quà",
+                                      prefixIcon: Padding(
+                                        padding: EdgeInsets.all(
+                                            defaultPadding),
+                                        child: Icon(Icons.card_giftcard),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  TextFormField(
+                                    controller: description,
+                                    cursorColor: kPrimaryColor,
+                                    maxLines: 5,
+                                    decoration:
+                                    const InputDecoration(
+                                      hintText: "Mô tả",
+                                      prefixIcon: Padding(
+                                        padding: EdgeInsets.all(
+                                            defaultPadding),
+                                        child: Icon(Icons.description),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  TextFormField(
+                                    controller: price,
+                                    cursorColor: kPrimaryColor,
+                                    keyboardType: TextInputType.number,
+                                    decoration:
+                                    const InputDecoration(
+                                      hintText: "Điểm đổi quà",
+                                      prefixIcon: Padding(
+                                        padding: EdgeInsets.all(
+                                            defaultPadding),
+                                        child: Icon(Icons.star_border),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  TextFormField(
+                                    controller: amount,
+                                    cursorColor: kPrimaryColor,
+                                    maxLines: 1,
+                                    keyboardType: TextInputType.number,
+                                    decoration:
+                                    const InputDecoration(
+                                      hintText: "Số lượng",
+                                      prefixIcon: Padding(
+                                        padding: EdgeInsets.all(
+                                            defaultPadding),
+                                        child: Icon(Icons.description),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: SizedBox(
+                                          width: 330,
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              image = await ImagePicker()
+                                                  .pickImage(source: ImageSource.gallery);
+                                              if (image == null) return;
+                                              imageName = basename(image!.path);
+                                              setState(() {
+                                                photo.text = imageName;
+                                              });
+                                            },
+                                            child: TextFormField(
+                                              controller: photo,
+                                              cursorColor: kPrimaryColor,
+                                              maxLines: 1,
+                                              keyboardType: TextInputType.number,
+                                              decoration:
+                                              const InputDecoration(
+                                                enabled: false,
+                                                hintText: "Hình ảnh",
+                                                prefixIcon: Padding(
+                                                  padding: EdgeInsets.all(
+                                                      defaultPadding),
+                                                  child: Icon(Icons.description),
+                                                ),
+                                              ),
+                                            ),
+                                          )))
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () => Navigator.pop(
+                                context, 'Cancel'),
+                            child: const Text('Huỷ'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final url = await UserHelper.upLoadImage(name: imageName, filePath: image!.path);
+                              if(url!=""){
+                                await UserHelper.addGift(amount: int.parse(amount.text), nameGift: name.text, price: int.parse(price.text), description: description.text, url: url);
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  backgroundColor: kPrimaryColor,
+                                  content: Text("Thêm quà không thành công!"),
+                                ));
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                backgroundColor: kPrimaryColor,
+                                content: Text("Thêm quà thành công!"),
+                              ));
+                              return Navigator.pop(
+                                  context, 'OK');
+                            },
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      );
+                    }),
+                tooltip: 'Increment',
+                child: const Icon(Icons.add),
+              );
+            } else {
+              return const SizedBox();
+            }
+          }
+          return const Center(
+            child: SizedBox(),
+          );
+        },
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

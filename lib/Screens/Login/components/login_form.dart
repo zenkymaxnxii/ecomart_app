@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants.dart';
@@ -28,6 +31,48 @@ class _LoginFormState extends State<LoginForm> {
     _emailController = TextEditingController(text: "");
     _passwordController = TextEditingController(text: "");
   }
+  String mToken = "";
+
+  Future<void> requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      sound: true,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print("User granted permission");
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      print("User granted provisional permission");
+    } else {
+      print("User declined or has not accepted permission");
+    }
+  }
+
+  Future<void> getToken() async {
+    await FirebaseMessaging.instance.getToken().then((token) {
+      setState(() {
+        mToken = token!;
+        print("My token is: $mToken");
+      });
+      saveToken(mToken);
+    });
+  }
+
+  void saveToken(String token) async {
+    final userRef =
+    FirebaseFirestore.instance.collection("users").doc(AuthHelper.getId());
+    if ((await userRef.get()).exists) {
+      await userRef.update({
+        "token": token,
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +134,17 @@ class _LoginFormState extends State<LoginForm> {
                           setState(() {
                             isLoading = false;
                           });
+                          await requestPermission();
+                          await getToken();
                           _openMyPage();
+                        } else {
+                          setState(() {
+                            isLoading = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            backgroundColor: kPrimaryColor,
+                            content: Text("Email hoặc mật khẩu không chính xác!"),
+                          ));
                         }
                       } catch (e) {
                         print(e);

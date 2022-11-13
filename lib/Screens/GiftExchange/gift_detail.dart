@@ -103,6 +103,7 @@ class _GiftDetailState extends State<GiftDetail> {
             ),
           ),
           Container(
+              width: double.infinity,
               decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(16.0),
@@ -117,6 +118,7 @@ class _GiftDetailState extends State<GiftDetail> {
               margin: const EdgeInsets.only(top: 246, bottom: 50),
               child: SingleChildScrollView(
                 child: Column(
+                  mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     const SizedBox(
                       height: 15,

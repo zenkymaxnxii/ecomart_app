@@ -190,6 +190,17 @@ class _HistoryOrderPageState extends State<HistoryOrderPage>
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
                               ),
+                            ),
+                            const SizedBox(
+                              height: 3,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 1.5,
+                              child: Text(
+                                "Ngày đến lấy: ${listOrders[index]['pick_up_date'] ?? ""}",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
                             )
                           ],
                         ),

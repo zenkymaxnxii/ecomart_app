@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomart_app/Model/ItemGridView.dart';
 import 'package:ecomart_app/Screens/GiftExchange/gift_exchange_screen.dart';
 import 'package:ecomart_app/Screens/GiftExchange/gift_exchanged_screen.dart';
+import 'package:ecomart_app/Screens/Guide/guide_screen.dart';
 import 'package:ecomart_app/Screens/Notification/notification_screen.dart';
 import 'package:ecomart_app/Screens/Order/order_screen.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class _HomePage2State extends State<HomePage2> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
+      padding: const EdgeInsets.fromLTRB(20, 40, 20, 0),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -55,7 +56,8 @@ class _HomePage2State extends State<HomePage2> {
                   child: Opacity(
                     opacity: 0.8,
                     child: Container(
-                      padding: const EdgeInsets.only(left: 3, right: 3, top: 2, bottom: 2),
+                      padding: const EdgeInsets.only(
+                          left: 3, right: 3, top: 2, bottom: 2),
                       decoration: BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.circular(20)),
@@ -172,7 +174,8 @@ class _HomePage2State extends State<HomePage2> {
             height: 20,
           ),
           Flexible(
-              child: GridView.count(
+              child: SingleChildScrollView(
+                child: GridView.count(
             shrinkWrap: true,
             crossAxisCount: 2,
             padding: const EdgeInsets.all(10),
@@ -180,88 +183,89 @@ class _HomePage2State extends State<HomePage2> {
             mainAxisSpacing: 20,
             physics: const NeverScrollableScrollPhysics(),
             children: List.generate(listItem.length, (index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return listItem[index].screen!;
-                      },
-                    ),
-                  );
-                },
-                child: Container(
-                    decoration: BoxDecoration(
-                      color: kPrimaryColor,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          right: 0,
-                          left: 0,
-                          bottom: 30,
-                          top: 0,
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  decoration: BoxDecoration(
-                                    color: kPrimaryLightColor,
-                                    borderRadius: BorderRadius.circular(40),
-                                  ),
-                                  child: Icon(
-                                    listItem[index].icon,
-                                    size: 50,
-                                  ),
-                                ),
-                                Text(
-                                  listItem[index].name!,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 18),
-                                )
-                              ],
-                            ),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return listItem[index].screen!;
+                        },
+                      ),
+                    );
+                  },
+                  child: Container(
+                      decoration: BoxDecoration(
+                        color: kPrimaryColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
                           ),
-                        ),
-                        Align(
-                          alignment: AlignmentDirectional.bottomEnd,
-                          child: Container(
-                            height: 30,
-                            width: double.infinity,
-                            decoration: const BoxDecoration(
-                              color: kPrimaryLightColor,
-                              borderRadius: BorderRadius.only(
-                                bottomRight: Radius.circular(20),
-                                bottomLeft: Radius.circular(20),
-                              ),
-                            ),
+                        ],
+                      ),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            right: 0,
+                            left: 0,
+                            bottom: 30,
+                            top: 0,
                             child: Center(
-                              child: Text(
-                                listItem[index].des!,
-                                style: const TextStyle(
-                                    color: Colors.black54, fontSize: 18),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    decoration: BoxDecoration(
+                                      color: kPrimaryLightColor,
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    child: Icon(
+                                      listItem[index].icon,
+                                      size: 50,
+                                    ),
+                                  ),
+                                  Text(
+                                    listItem[index].name!,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 18),
+                                  )
+                                ],
                               ),
                             ),
                           ),
-                        )
-                      ],
-                    )),
-              );
+                          Align(
+                            alignment: AlignmentDirectional.bottomEnd,
+                            child: Container(
+                              height: 30,
+                              width: double.infinity,
+                              decoration: const BoxDecoration(
+                                color: kPrimaryLightColor,
+                                borderRadius: BorderRadius.only(
+                                  bottomRight: Radius.circular(20),
+                                  bottomLeft: Radius.circular(20),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  listItem[index].des!,
+                                  style: const TextStyle(
+                                      color: Colors.black54, fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      )),
+                );
             }),
-          )),
+          ),
+              )),
         ],
       ),
     );
@@ -277,6 +281,9 @@ class _HomePage2State extends State<HomePage2> {
         const OrderScreen()));
     list.add(ItemGridView("Quà đã đổi", "Xem lại", Icons.account_balance_wallet,
         const GiftExchangedScreen()));
+    list.add(ItemGridView("Phân loại rác", "Xem hướng dẫn", Icons.sort,
+        const GuideScreen()));
+
     return list;
   }
 }

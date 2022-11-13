@@ -29,6 +29,13 @@
             {
               "client_id": "81587016438-qf21c5j94iee92125qdbbc222mr0ihfs.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "81587016438-j78phccfvs7sgbcfe775jcf4ncbicbgj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.minhnhat.ecomart.ecomartApp"
+              }
             }
           ]
         }

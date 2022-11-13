@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecomart_app/Screens/Home/home_screen.dart';
 import 'package:ecomart_app/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -47,6 +48,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.hasData) {
                           final listNotice = snapshot.data!.docs;
+                          listNotice.sort((a,b)=>b['date_time'].compareTo(a['date_time']));
                           return listViewNotice(listNotice, true);
                         }
                         return const SizedBox();
@@ -61,6 +63,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.hasData) {
                           final listNotice = snapshot.data!.docs;
+                          listNotice.sort((a,b)=>b['date_time'].compareTo(a['date_time']));
                           return listViewNotice(listNotice, false);
                         } else {
                           return const SizedBox();
@@ -85,7 +88,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             onTap: (){
               UserHelper.readNotice(noticeId: listNotice[index].id, collection: isAdmin?"notice_admin":"notice_user");
               Navigator.push(context, MaterialPageRoute(builder: (_){
-                return const OrderScreen();
+                return (listNotice[index]['status'] == 2 && !isAdmin)? HomeScreen(isHistory: true,) :const OrderScreen();
               }));
             },
             child: Opacity(
@@ -130,11 +133,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             isAdmin?
                             "${listNotice[index]['name']} đã đặt:\n${listNotice[index]['description']}.\nTại: ${listNotice[index]['address']} sdt ${listNotice[index]['phone_number']}.":
                             listNotice[index]['status'] == 1 ?
-                            "Đơn:\n${listNotice[index]['description']}.\n đang được shipper tới nhận."
+                            "Đơn:\n${listNotice[index]['description']}.\nđang được shipper tới nhận."
                                 :
                             "Đơn:\n${listNotice[index]['description']}.\n đã hoàn thành"
                             ,
                             maxLines: 10,
+                            style: const TextStyle(
+                                fontSize: 15, overflow: TextOverflow.ellipsis),
+                          ),
+                        ),
+                        if(!isAdmin) SizedBox(
+                          width: MediaQuery.of(context).size.width / 1.4,
+                          child: Text("Thời gian: ${listNotice[index]['pick_up_date'] ?? ""}",
+                            maxLines: 2,
                             style: const TextStyle(
                                 fontSize: 15, overflow: TextOverflow.ellipsis),
                           ),

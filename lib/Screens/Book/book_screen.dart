@@ -111,7 +111,7 @@ class BookScreenState extends State<BookScreen> {
                                               });
                                             },
                                             child: Container(
-                                              width: 70,
+                                              width: 80,
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(8),
