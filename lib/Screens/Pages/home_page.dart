@@ -31,6 +31,13 @@ class _HomePage2State extends State<HomePage2> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 40, 20, 0),
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage("assets/images/background.png"),
+          opacity: 0.3,
+          fit: BoxFit.fitHeight
+        )
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
